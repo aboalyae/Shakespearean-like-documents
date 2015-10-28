@@ -1,0 +1,325 @@
+def clean_up(s):
+    """ (str) -> str
+    Return a new string based on s in which all letters have been
+    converted to lowercase and punctuation characters have been stripped 
+    from both ends. Inner punctuation is left untouched. 
+
+    >>> clean_up('Happy Birthday!!!')
+    'happy birthday'
+    >>> clean_up("-> It's on your left-hand side.")
+    " it's on your left-hand side"
+    """
+    
+    punctuation = """!"',;:.-?)([]<>*#\n\t\r"""
+    result = s.lower().strip(punctuation)
+    return result
+#defining the helper function clean_up_split where it uses the helper
+#function clean_up and split to get the characters of the strings without
+#punctuation
+def clean_up_split(str):
+    """(str)->list
+    Return the list of the words in the string after the punctation has
+    been stripped and cleaned. Inner punctuation is stripped as well
+    >>>clean_up_split('James Fennimore Cooper\n')
+    ['james', 'fennimore', 'cooper']
+    >>>clean_up_split('Peter, Paul and Mary\n')
+    ['peter', 'paul', 'and', 'mary']
+    """
+    # I will be using this function a lot of time to 
+    #clean the words from punctuations and split them into single words
+    result=[]
+    a=str.split()
+    for word in a:
+        result.append(clean_up(word))
+        if '' in result:
+        	result.remove('')
+    return result
+#defining a helper function that turns a list of 
+#lines into a single string containing all of the strings
+def list_to_string(lines):
+    """(list of str)->str
+    converts a list of lines into a single huge string containing
+    all of the strings,in order, from the list of lines
+    >>>list_to_string(['The time has come, the Walrus said\n',
+         'To talk of many things: of shoes - and ships - and sealing wax,\n',
+         'Of cabbages; and kings.\n',
+         'And why the sea is boiling hot;\n',
+         'and whether pigs have wings.\n'])
+    'The time has come, the Walrus said\nTo talk of many things:
+    of shoes - and ships - and sealing wax,\nOf cabbages;
+    and kings.\nAnd why the sea is boiling hot;\nand whether pigs have wings.\n'
+    """
+    whole_string=''
+    for i in range(len(lines)):
+        whole_string += lines[i]
+    return whole_string
+    
+#defining a function that calculates the average number of characters per word
+#after the punctuation has been stripped
+def avg_word_length(text):
+    """ (list of str) -> float
+
+    Precondition: text is non-empty. Each str in text ends with \n and
+    text contains at least one word.
+
+    Return the average length of all words in text. 
+    
+    >>> text = ['James Fennimore Cooper\n', 'Peter, Paul and Mary\n']
+    >>> avg_word_length(text)
+    5.142857142857143
+    >>> avg_word_length(['The first linguistic feature is simply \
+    the average number of characters per word, calculated after \
+    the punctuation has been stripped using the already-written \
+    clean_up function'])
+    6.04
+    >>>text=['Eman eats -- - salad.\n','salad tastes awful \n']
+    >>>avg_word_length(text)
+    4.833333333333333
+    """
+    total_words=[]
+    for str in text:
+        new_list=clean_up_split(str)
+        for word in new_list:
+            total_words.append(len(word))
+    average=sum(total_words)/len(total_words)
+    return average
+#defining a function that measures the repetitiveness of the vocabulary
+def type_token_ratio(text):
+    """ (list of str) -> float
+
+    Precondition: text is non-empty. Each str in text ends with \n and
+    text contains at least one word.
+
+    Return the Type Token Ratio (TTR) for this text. TTR is the number of
+    different words divided by the total number of words.
+
+    >>> text = ['James Fennimore Cooper\n', 'Peter, Paul, and Mary\n',
+        'James Gosling\n']
+    >>> type_token_ratio(text)
+    0.8888888888888888
+    >>> text=["I enjoy this course so much","Csc108 is so much fun"]
+    >>> type_token_ratio(text)
+    0.8181818181818182
+    >>>
+    """
+    #Accumulating two lists. One for
+    #the total words and another for words repeated only once
+    repeated_once=[]
+    total_words=[]
+    for str in text:
+        new_str=clean_up_split(str)
+        for word in new_str:
+            if word not in repeated_once:
+                repeated_once.append(word)
+                total_words.append(word)
+            else:
+                total_words.append(word)
+    ratio=len(repeated_once)/len(total_words)
+    return ratio
+#defining function to calculate the ratio of words that appear exactly once
+def hapax_legomena_ratio(text):
+    """ (list of str) -> float
+
+    Precondition: text is non-empty. Each str in text ends with \n and
+    text contains at least one word.
+
+    Return the hapax legomena ratio for text. This ratio is the number of 
+    words that occur exactly once divided by the total number of words.
+
+    >>> text = ['James Fennimore Cooper\n', 'Peter, Paul, and Mary\n',
+    'James Gosling\n']
+    >>> hapax_legomena_ratio(text)
+    0.7777777777777778
+    >>> hapax_legomena_ratio(['this','is','this','awesome','so','so','so'])
+    0.2857142857142857
+    >>> hapax_legomena_ratio(['this','This',':)this'])
+    0
+    >>> hapax_legomena_ratio(['this','is','awesome'])
+    1.0
+
+    """
+    # Creating 3 lists; one for the words that occur at least once, another 
+    #for words that occur at least twice and the third for the total words
+    at_least_once=[]
+    at_least_twice=[]
+    total=[]
+    for str in text:
+        new_str=clean_up_split(str)
+        for word in new_str:
+            if word not in at_least_once:
+                at_least_once.append(word)
+                total.append(word)
+            elif word not in at_least_twice:
+                at_least_twice.append(word)
+                total.append(word)
+            # To account for words occurring more than twice
+            else:
+                total.append(word)
+    #Since the words in at_least_twice list will be contained in the 
+    # at_least_once list, it makes sense to subtract the length of
+    # at_least_twice from the length of at_least_once to get the number
+    # of words that occur exactly once
+    exactly_once=len(at_least_once)-len(at_least_twice)
+    if exactly_once>0:
+        ratio1=exactly_once/len(total)
+    else:
+        ratio1=0
+    return ratio1
+#defining a function that splits a string on separators
+def split_on_separators(original, separators):
+    """ (str, str) -> list of str
+
+    Return a list of non-empty, non-blank strings from original,
+    determined by splitting original on any of the separators.
+    separators is a string of single-character separators.
+
+    >>> split_on_separators("Hooray! Finally, we're done.", "!,")
+    ['Hooray', ' Finally', " we're done."]
+    >>> split_on_separators("Yes! This week was so productive; \
+    finished so much in a very little time! Really? Yes. \
+    I worked so hard!",'!;?.')
+    ['Yes', ' This week was so productive',
+    '     finished so much in a very little time',
+    ' Really', ' Yes', '     I worked so hard']
+    >>>a="Eman..    ! is.    awesome-., is this life   ?!."
+    >>>split_on_separators(a,'!.?,')
+    ['Eman', ' is', '    awesome-', ' is this life   ']
+    >>>split_on_separators("Hi! !! my name is Eman. I am frustrated, now.","!.")
+    ['Hi', ' my name is Eman', ' I am frustrated, now']
+    """
+    result=[original]
+    #Looping over separators
+    for sep in separators:
+        original,result=result,[]
+        for str in original:
+            result+=str.split(sep)
+            for str in result:
+            # to get rid of any empty or blank strings
+            	if str.strip()=='':
+            		result.remove(str)
+    return result
+#defining a function that calculates the average number of words per sentence
+def avg_sentence_length(text):
+    """ (list of str) -> float
+
+    Precondition: text contains at least one sentence.
+    
+    A sentence is defined as a non-empty string of non-terminating 
+    punctuation surrounded by terminating punctuation or beginning or 
+    end of file. Terminating punctuation is defined as !?.
+
+    Return the average number of words per sentence in text.   
+
+    >>> text = ['The time has come, the Walrus said\n',
+         'To talk of many things: of shoes - and ships - and sealing wax,\n',
+         'Of cabbages; and kings.\n',
+         'And why the sea is boiling hot;\n',
+         'and whether pigs have wings.\n']
+    >>> avg_sentence_length(text)
+    17.5
+    >>> avg_sentence_length(['This.\n','is.\n','awesome.\n'])
+    1.0
+    >>> avg_sentence_length(['its.--not---right'])
+    1.0
+    """
+    total_sentence_count=0
+    word_count=0
+    #converting the list of strings into a single string using helper function
+    new_string=list_to_string(text)
+    # Separating the new_string on '!?.' to get the sentences
+    total_sentences=split_on_separators(new_string,'!?.')
+    for sentence in total_sentences:
+    # some sentences end with '.\n', so if you separate them you get 
+    # a whole sentence '\n', which should not be counted in our 
+    #total_sentence_count
+        if sentence != '\n':
+            total_sentence_count +=1
+            splitted_sentence=clean_up_split(sentence)
+            for word in splitted_sentence:
+            # counting non-empty words
+                if word !='':
+                    word_count+=1
+    average_word=word_count/total_sentence_count
+    return average_word
+#defining a function that calculates the average number of phrases per sentence
+def avg_sentence_complexity(text):
+    """ (list of str) -> float
+
+    Precondition: text contains at least one sentence.    
+
+    A sentence is defined as a non-empty string of non-terminating
+    punctuation surrounded by terminating punctuation or beginning or
+    end of file. Terminating punctuation is defined as !?.
+    Phrases are substrings of sentences, separated by one or more of ,;:
+
+    Return the average number of phrases per sentence in text.
+
+    >>> text = ['The time has come, the Walrus said\n',
+         'To talk of many things: of shoes - and ships - and sealing wax,\n',
+         'Of cabbages; and kings.\n',
+         'And why the sea is boiling hot;\n',
+         'and whether pigs have wings.\n']
+    >>> avg_sentence_complexity(text)
+    3.5
+    >>> avg_sentence_complexity(['This','is','awesome'])
+    1.0
+    >>> avg_sentence_complexity(['its,--not---right'])
+    2.0
+    """
+    total_sentence_count=0
+    phrase_count=0
+    #converting the list of strings into a single string
+    new_string=list_to_string(text)
+    total_sentence1=split_on_separators(new_string,'!?.')
+    for sentence in total_sentence1:
+    # some sentences end with '.\n', so if you separate them you get 
+    # a whole sentence '\n', which should not be counted in our 
+    #total_sentence_count
+        if sentence !='\n':
+            total_sentence_count+=1
+            #separating each sentence on ',:;' to get phrases
+            splitted_sentence=split_on_separators(sentence,',:;')
+            for phrase in splitted_sentence:
+                phrase_count+=1
+    average_phrase=phrase_count/total_sentence_count
+    return average_phrase
+
+#defining a function that calculates the similarity between two 
+#linguistic signatures.
+def compare_signatures(sig1, sig2, weight):
+    """ (list, list, list of float) -> float
+
+    Return a non-negative float indicating the similarity of the two 
+    linguistic signatures, sig1 and sig2. The smaller the number the more
+    similar the signatures. Zero indicates identical signatures.
+    
+    sig1 and sig2 are 6-item lists with the following items:
+    0  : Author Name (a string)
+    1  : Average Word Length (float)
+    2  : Type Token Ratio (float)
+    3  : Hapax Legomena Ratio (float)
+    4  : Average Sentence Length (float)
+    5  : Average Sentence Complexity (float)
+
+    weight is a list of multiplicative weights to apply to each
+    linguistic feature. weight[0] is ignored.
+
+    >>> sig1 = ["a_string" , 4.4, 0.1, 0.05, 10.0, 2.0]
+    >>> sig2 = ["a_string2", 4.3, 0.1, 0.04, 16.0, 4.0]
+    >>> weight = [0, 11.0, 33.0, 50.0, 0.4, 4.0]
+    >>> compare_signatures(sig1, sig2, weight)
+    12.000000000000007
+    >>>sig1=["a_string",0,1,0.5,3,0]
+    >>>sig2=["a_string2",1,0.4,4,2,0]
+    >>>weight=[0,11.0,33.0,50.0,0.4,4.0]
+    >>> compare_signatures(sig1, sig2, weight)
+    206.20000000000002
+    """
+    # simply adding the numbers in the accumulator
+    result=[]
+    for i in range(1,len(sig1)):
+    # float function is used to get float numbers instead of integer numbers
+        result.append(float(abs(sig1[i]-sig2[i])*weight[i]))
+    final_result=sum(result)
+    return final_result
+            
